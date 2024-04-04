@@ -1,0 +1,20 @@
+Suwałki;11.8
+Antananarivo;13.3
+Conakry;29.0
+Boise;18.6
+Harare;16.3
+Suwałki;11.8
+Chongqing;19.8
+Pontianak;34.4
+Bamako;36.0
+Hanoi;4.9
+Monterrey;21.9
+Novosibirsk;8.2
+Ürümqi;-7.6
+Tauranga;-1.5
+Gagnoa;11.0
+Sapporo;-5.4
+Dallas;21.6
+San José;24.7
+Harare;30.8
+Atlanta;34.4
