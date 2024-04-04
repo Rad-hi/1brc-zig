@@ -2,10 +2,10 @@ const std = @import("std");
 const fs = std.fs;
 const print = std.debug.print;
 
-const MIN: u8 = 0;
-const MAX: u8 = 1;
-const CNT: u8 = 2;
-const SUM: u8 = 3;
+const MIN: u2 = 0;
+const MAX: u2 = 1;
+const CNT: u2 = 2;
+const SUM: u2 = 3;
 
 var default_arr = [_]f32{99.0, -99.0, 0.0, 0.0};
 
@@ -42,46 +42,28 @@ pub fn main() !void {
         var it = std.mem.split(u8, line.items, ";");
 
         // I know i'll only get two values, so I am iterating manually
-        var city: []const u8 = undefined;
-        if (it.next()) |v| {
-            city = v;
-        } else {
-            print("Error obtaining [city]", .{});
-            continue;
-        }
-
-        var value: f32 = undefined;
-        if (it.next()) |v| {
-            if (std.fmt.parseFloat(f32, v)) |val| {
-                value = val;
-            } else |err| {
-                print("{}", .{err});
-                continue;
-            }
-        } else {
-            print("Error obtaining [value]", .{});
-            continue;
-        }
-
+        var city = it.next().?;
+        var value = try std.fmt.parseFloat(f32, it.next().?);
         print("{s} -- {}\n", .{city, value});
 
         // Ref: https://devlog.hexops.com/2022/zig-hashmaps-explained/#get-a-value-insert-if-not-exist
-        var vals = try db.getOrPut(city);
-        if (!vals.found_existing) {
-            vals.value_ptr.* = default_arr;
+        var vals = db.get(city);
+        if (vals) |_| {
+            if (vals.?[MIN] > value) {
+                vals.?[MIN] = value;
+            } else if (vals.?[MAX] < value) {
+                vals.?[MAX] = value;
+            }
+            vals.?[CNT] += 1;
+            vals.?[SUM] += value;
+        } else {
+            // doesn't exist
+            try db.put(city, [4]f32{value, value, 1, value});
         }
 
-        if (vals.value_ptr.*[MIN] > value) {
-            vals.value_ptr.*[MIN] = value;
-        } else if (vals.value_ptr.*[MAX] < value) {
-            vals.value_ptr.*[MAX] = value;
-        }
-        vals.value_ptr.*[CNT] += 1;
-        vals.value_ptr.*[SUM] += value;
-
-        if (vals.found_existing) {
-            print("{s}{any} \n", .{city, vals.value_ptr.*});
-        }
+        // if (vals.found_existing) {
+        //     print("{s}{any} \n", .{city, vals.value_ptr.*});
+        // }
 
     } else |err| switch (err) {
         error.EndOfStream => {}, // Continue on
